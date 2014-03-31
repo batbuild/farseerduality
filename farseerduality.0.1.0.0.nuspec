@@ -1,0 +1,16 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+    <metadata>
+        <id>FarseerDuality</id>
+        <version>0.1.0.0</version>
+        <title>FarseerDuality</title>
+        <authors>@BatCatGames</authors>
+        <projectUrl>https://github.com/BraveSirAndrew/farseerduality.git</projectUrl>
+        <requireLicenseAcceptance>false</requireLicenseAcceptance>
+        <description>Forked from https://farseerphysics.codeplex.com/ and adjusted to Duality</description>
+        <language>en-IE</language>
+    </metadata>
+    <files>
+        <file src="bin\Release\FarseerDuality.dll" target="lib\net40\FarseerDuality.dll" />
+    </files>
+</package>
