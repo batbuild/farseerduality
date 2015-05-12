@@ -1,1 +1,1 @@
-The included version of Farseer Physics has been altered to fit the Duality projects needs.
+The included version of Farseer Physics has been altered to fit the Duality projects needs and supports and android runtime :D.

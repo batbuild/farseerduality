@@ -5,6 +5,8 @@ VisualStudioVersion = 12.0.21005.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FarseerDuality", "FarseerDuality.csproj", "{AC4AD95C-B497-4466-AC90-CF9260279400}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FarseerDuality.Android", "FarseerDuality.Android.csproj", "{3C3C50F2-0509-42F1-93F0-E38929A9E3F9}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +17,10 @@ Global
 		{AC4AD95C-B497-4466-AC90-CF9260279400}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{AC4AD95C-B497-4466-AC90-CF9260279400}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{AC4AD95C-B497-4466-AC90-CF9260279400}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3C3C50F2-0509-42F1-93F0-E38929A9E3F9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3C3C50F2-0509-42F1-93F0-E38929A9E3F9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3C3C50F2-0509-42F1-93F0-E38929A9E3F9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3C3C50F2-0509-42F1-93F0-E38929A9E3F9}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
