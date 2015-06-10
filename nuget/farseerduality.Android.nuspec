@@ -1,0 +1,17 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+    <metadata>
+        <id>Android.Duality.Farseer</id>
+        <version>@version</version>
+        <title>Android Duality Farseer</title>
+        <authors>@BatCatGames</authors>
+        <projectUrl>https://github.com/BraveSirAndrew/farseerduality.git</projectUrl>
+        <requireLicenseAcceptance>false</requireLicenseAcceptance>
+        <description>Forked from https://farseerphysics.codeplex.com/ and adjusted to Duality and now adjusted for android</description>
+        <language>en-IE</language>
+    </metadata>
+    <files>
+        <file src="bin\Release\FarseerDuality.dll" target="lib\MonoAndroid\FarseerDuality.dll" />
+        <file src="bin\Release\FarseerDuality.xml" target="lib\MonoAndroid\FarseerDuality.xml" />
+    </files>
+</package>

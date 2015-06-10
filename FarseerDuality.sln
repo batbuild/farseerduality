@@ -7,6 +7,13 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FarseerDuality", "FarseerDu
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FarseerDuality.Android", "FarseerDuality.Android.csproj", "{3C3C50F2-0509-42F1-93F0-E38929A9E3F9}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{1F05961E-93FA-4C2E-B316-26CE08A966D4}"
+	ProjectSection(SolutionItems) = preProject
+		Build.bat = Build.bat
+		Build.fsx = Build.fsx
+		nuget\farseerduality.Android.nuspec = nuget\farseerduality.Android.nuspec
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
