@@ -11,7 +11,7 @@ let packagesDir = @".\deploy\"
 let authors = ["Andrea Magnorsky"; "Andrew O'Connor"; "Dean Ellis";]
 
 // project name and description
-let projectName = "Android.Duality.Farseer"
+let projectName = "Farseer.Duality.Android"
 let projectDescription = "Farseer for Duality on Android"
 let projectSummary = projectDescription // TODO: write a summary
 
