@@ -59,9 +59,9 @@ Target "AndroidPack" (fun _ ->
             Project = projectName
             Description = projectDescription      
             Version = if isLocalBuild then buildVersion else "0.1."+ buildVersion
-            PublishUrl = getBuildParamOrDefault "nugetrepo" ""
-            AccessKey = getBuildParamOrDefault "keyfornuget" ""
-            Publish = hasBuildParam "nugetrepo"
+            AccessKey = getBuildParamOrDefault "nugetkey" ""
+            Publish = hasBuildParam "nugetkey"
+            PublishUrl = getBuildParamOrDefault "nugetUrl" ""            
             WorkingDir = @".\"
             OutputPath = packagesDir
         }) "nuget/farseerduality.Android.nuspec"
