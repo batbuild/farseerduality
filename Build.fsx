@@ -8,6 +8,8 @@ open Fake.AssemblyInfoFile
 let buildDir  = @".\build\"
 let packagesDir = @".\deploy\"
 
+let authors = ["Andrea Magnorsky"; "Andrew O'Connor"; "Dean Ellis";]
+
 // project name and description
 let projectName = "Android.Duality.Farseer"
 let projectDescription = "Farseer for Duality on Android"
@@ -50,17 +52,19 @@ Target "Build" (fun _ ->
     |> DoNothing  
 )
 
-Target "AndroidPack" (fun _ ->      
-    ["nuget/farseerduality.Android.nuspec";]
-    |> List.iter (fun spec ->
+Target "AndroidPack" (fun _ ->         
     NuGet (fun p -> 
         {p with 
-            Version = version                        
+            Authors = authors
+            Project = projectName
+            Description = projectDescription      
+            Version = "0.1."+ buildVersion                                            
             PublishUrl = getBuildParamOrDefault "nugetrepo" ""
             AccessKey = getBuildParamOrDefault "keyfornuget" ""
             Publish = hasBuildParam "nugetrepo"
+            WorkingDir = @".\"
             OutputPath = packagesDir
-        }) spec)
+        }) "nuget/farseerduality.Android.nuspec"
 )
 
 // Dependencies
@@ -69,6 +73,7 @@ Target "AndroidPack" (fun _ ->
   ==> "RestorePackages"
   ==> "Build"    
   ==> "AndroidPack"
+  
 
-// start build
+
 RunTargetOrDefault "AndroidPack"
