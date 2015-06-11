@@ -48,7 +48,7 @@ Target "Build" (fun _ ->
                     "Configuration", buildMode                    
                 ]
         }
-    build setParams "./FarseerDuality.sln"    
+    build setParams "./FarseerDuality.Android.sln"    
     |> DoNothing  
 )
 
@@ -58,7 +58,7 @@ Target "AndroidPack" (fun _ ->
             Authors = authors
             Project = projectName
             Description = projectDescription      
-            Version = "0.1."+ buildVersion                                            
+            Version = if isLocalBuild then buildVersion else "0.1."+ buildVersion
             PublishUrl = getBuildParamOrDefault "nugetrepo" ""
             AccessKey = getBuildParamOrDefault "keyfornuget" ""
             Publish = hasBuildParam "nugetrepo"
