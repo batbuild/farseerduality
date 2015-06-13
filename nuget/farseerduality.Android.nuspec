@@ -9,10 +9,10 @@
 		<summary>@summary@</summary>
         <projectUrl>https://github.com/batbuild/farseerduality</projectUrl>
 		<licenseUrl>https://github.com/batbuild/farseerduality/blob/android-port/LICENSE</licenseUrl>
-        <requireLicenseAcceptance>false</requireLicenseAcceptance>        
-    </metadata>
+        <requireLicenseAcceptance>false</requireLicenseAcceptance>
+		@dependencies@
+	</metadata>
     <files>
-        <file src="bin\Release\Android\FarseerDuality.dll" target="lib\MonoAndroid\FarseerDuality.dll" />
-        <file src="bin\Release\Android\FarseerDuality.pdb" target="lib\MonoAndroid\FarseerDuality.pdb" />
+        <file src="bin\Release\Android\FarseerDuality.dll" target="lib\MonoAndroid\FarseerDuality.dll" />        
     </files>
 </package>

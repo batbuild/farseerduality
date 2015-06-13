@@ -58,12 +58,13 @@ Target "AndroidPack" (fun _ ->
             Authors = authors
             Project = projectName
             Description = projectDescription      
-            Version = if isLocalBuild then buildVersion else "0.1."+ buildVersion
+            Version = if isLocalBuild then "0.1-local" else "0.1."+ buildVersion
             AccessKey = getBuildParamOrDefault "nugetkey" ""
             Publish = hasBuildParam "nugetkey"
-            PublishUrl = getBuildParamOrDefault "nugetUrl" ""            
+            PublishUrl = getBuildParamOrDefault "nugetUrl" ""
             WorkingDir = @".\"
             OutputPath = packagesDir
+            Dependencies = ["OpenTK.Duality.Android","0.1.49"]
         }) "nuget/farseerduality.Android.nuspec"
 )
 
