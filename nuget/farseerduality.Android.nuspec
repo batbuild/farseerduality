@@ -13,6 +13,6 @@
 		@dependencies@
 	</metadata>
     <files>
-        <file src="bin\Release\Android\FarseerDuality.dll" target="lib\MonoAndroid\FarseerDuality.dll" />        
+        <file src="bin\Release\Android\FarseerDuality.Android.dll" target="lib\MonoAndroid\FarseerDuality.Android.dll" />        
     </files>
 </package>
