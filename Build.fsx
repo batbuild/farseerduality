@@ -64,7 +64,7 @@ Target "AndroidPack" (fun _ ->
             PublishUrl = getBuildParamOrDefault "nugetUrl" ""
             WorkingDir = @".\"
             OutputPath = packagesDir
-            Dependencies = ["OpenTK.Duality.Android","0.1.49"]
+            Dependencies = []
         }) "nuget/farseerduality.Android.nuspec"
 )
 
