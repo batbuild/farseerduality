@@ -815,22 +815,22 @@ namespace FarseerPhysics.Dynamics
             input.Point1 = point1;
             input.Point2 = point2;
 
-            ContactManager.BroadPhase.RayCast((rayCastInput, proxyId) =>
+            ContactManager.BroadPhase.RayCast(delegate(ref RayCastInput rayCastInput, int proxyId)
             {
-                FixtureProxy proxy = ContactManager.BroadPhase.GetProxy(proxyId);
-                Fixture fixture = proxy.Fixture;
-                int index = proxy.ChildIndex;
-                RayCastOutput output;
-                bool hit = fixture.RayCast(out output, ref rayCastInput, index);
+	            FixtureProxy proxy = ContactManager.BroadPhase.GetProxy(proxyId);
+	            Fixture fixture = proxy.Fixture;
+	            int index = proxy.ChildIndex;
+	            RayCastOutput output;
+	            bool hit = fixture.RayCast(out output, ref rayCastInput, index);
 
-                if (hit)
-                {
-                    float fraction = output.Fraction;
-					Vector2 point = (1.0f - fraction) * rayCastInput.Point1 + fraction * rayCastInput.Point2;
-                    return callback(fixture, point, output.Normal, fraction);
-                }
+	            if (hit)
+	            {
+		            float fraction = output.Fraction;
+		            Vector2 point = (1.0f - fraction)*rayCastInput.Point1 + fraction*rayCastInput.Point2;
+		            return callback(fixture, point, output.Normal, fraction);
+	            }
 
-                return rayCastInput.MaxFraction; //input.MaxFraction;
+	            return rayCastInput.MaxFraction; //input.MaxFraction;
             }, ref input);
         }
 

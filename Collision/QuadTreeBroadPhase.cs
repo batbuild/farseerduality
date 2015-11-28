@@ -176,7 +176,7 @@ public class QuadTreeBroadPhase : IBroadPhase
         _quadTree.QueryAABB(TransformPredicate(callback), ref query);
     }
 
-    public void RayCast(Func<RayCastInput, int, float> callback, ref RayCastInput input)
+    public void RayCast(RayCastCallbackInternal callback, ref RayCastInput input)
     {
         _quadTree.RayCast(TransformRayCallback(callback), ref input);
     }
@@ -196,10 +196,10 @@ public class QuadTreeBroadPhase : IBroadPhase
     }
 
     private Func<RayCastInput, Element<FixtureProxy>, float> TransformRayCallback(
-        Func<RayCastInput, int, float> callback)
+        RayCastCallbackInternal callback)
     {
         Func<RayCastInput, Element<FixtureProxy>, float> newCallback =
-            (input, qtnode) => callback(input, qtnode.Value.ProxyId);
+            (input, qtnode) => callback(ref input, qtnode.Value.ProxyId);
         return newCallback;
     }
 

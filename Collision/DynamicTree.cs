@@ -54,16 +54,18 @@ namespace FarseerPhysics.Collision
         }
     }
 
-    /// <summary>
-    /// A dynamic tree arranges data in a binary tree to accelerate
-    /// queries such as volume queries and ray casts. Leafs are proxies
-    /// with an AABB. In the tree we expand the proxy AABB by Settings.b2_fatAABBFactor
-    /// so that the proxy AABB is bigger than the client object. This allows the client
-    /// object to move by small amounts without triggering a tree update.
-    ///
-    /// Nodes are pooled and relocatable, so we use node indices rather than pointers.
-    /// </summary>
-    public class DynamicTree<T>
+	public delegate float RayCastCallbackInternal(ref RayCastInput input, int nodeId);
+
+	/// <summary>
+	/// A dynamic tree arranges data in a binary tree to accelerate
+	/// queries such as volume queries and ray casts. Leafs are proxies
+	/// with an AABB. In the tree we expand the proxy AABB by Settings.b2_fatAABBFactor
+	/// so that the proxy AABB is bigger than the client object. This allows the client
+	/// object to move by small amounts without triggering a tree update.
+	///
+	/// Nodes are pooled and relocatable, so we use node indices rather than pointers.
+	/// </summary>
+	public class DynamicTree<T>
     {
         internal const int NullNode = -1;
         private static Stack<int> _stack = new Stack<int>(256);
@@ -299,16 +301,16 @@ namespace FarseerPhysics.Collision
             }
         }
 
-        /// <summary>
-        /// Ray-cast against the proxies in the tree. This relies on the callback
-        /// to perform a exact ray-cast in the case were the proxy contains a Shape.
-        /// The callback also performs the any collision filtering. This has performance
-        /// roughly equal to k * log(n), where k is the number of collisions and n is the
-        /// number of proxies in the tree.
-        /// </summary>
-        /// <param name="callback">A callback class that is called for each proxy that is hit by the ray.</param>
-        /// <param name="input">The ray-cast input data. The ray extends from p1 to p1 + maxFraction * (p2 - p1).</param>
-        public void RayCast(Func<RayCastInput, int, float> callback, ref RayCastInput input)
+	    /// <summary>
+	    /// Ray-cast against the proxies in the tree. This relies on the callback
+	    /// to perform a exact ray-cast in the case were the proxy contains a Shape.
+	    /// The callback also performs the any collision filtering. This has performance
+	    /// roughly equal to k * log(n), where k is the number of collisions and n is the
+	    /// number of proxies in the tree.
+	    /// </summary>
+	    /// <param name="callback">A callback class that is called for each proxy that is hit by the ray.</param>
+	    /// <param name="input">The ray-cast input data. The ray extends from p1 to p1 + maxFraction * (p2 - p1).</param>
+		public unsafe void RayCast(RayCastCallbackInternal callback, ref RayCastInput input)
         {
             Vector2 p1 = input.Point1;
             Vector2 p2 = input.Point2;
@@ -332,12 +334,13 @@ namespace FarseerPhysics.Collision
                 Vector2.Max(ref p1, ref t, out segmentAABB.UpperBound);
             }
 
-            _stack.Clear();
-            _stack.Push(_root);
+	        var stack = stackalloc int[32];
+	        var stackIndex = 0;
+	        stack[stackIndex++] = _root;
 
-            while (_stack.Count > 0)
+			while(stackIndex > 0)
             {
-                int nodeId = _stack.Pop();
+	            int nodeId = stack[--stackIndex];
                 if (nodeId == NullNode)
                 {
                     continue;
@@ -354,7 +357,15 @@ namespace FarseerPhysics.Collision
                 // |dot(v, p1 - c)| > dot(|v|, h)
                 Vector2 c = node.AABB.Center;
                 Vector2 h = node.AABB.Extents;
-                float separation = Math.Abs(Vector2.Dot(new Vector2(-r.Y, r.X), p1 - c)) - Vector2.Dot(absV, h);
+	            var left = new Vector2(-r.Y, r.X);
+	            var right = p1 - c;
+	            float leftDot;
+				Vector2.Dot(ref left, ref right, out leftDot);
+
+	            float rightDot;
+	            Vector2.Dot(ref absV, ref h, out rightDot);
+
+                float separation = Math.Abs(leftDot) - rightDot;
                 if (separation > 0.0f)
                 {
                     continue;
@@ -367,7 +378,7 @@ namespace FarseerPhysics.Collision
                     subInput.Point2 = input.Point2;
                     subInput.MaxFraction = maxFraction;
 
-                    float value = callback(subInput, nodeId);
+                    float value = callback(ref subInput, nodeId);
 
                     if (value == 0.0f)
                     {
@@ -380,14 +391,18 @@ namespace FarseerPhysics.Collision
                         // Update segment bounding box.
                         maxFraction = value;
                         Vector2 t = p1 + maxFraction * (p2 - p1);
-                        segmentAABB.LowerBound = Vector2.Min(p1, t);
-                        segmentAABB.UpperBound = Vector2.Max(p1, t);
+
+	                    Vector2 min, max;
+	                    Vector2.Min(ref p1, ref t, out min);
+	                    Vector2.Max(ref p1, ref t, out max);
+                        segmentAABB.LowerBound = min;
+                        segmentAABB.UpperBound = max;
                     }
                 }
                 else
                 {
-                    _stack.Push(node.Child1);
-                    _stack.Push(node.Child2);
+	                stack[stackIndex++] = node.Child1;
+	                stack[stackIndex++] = node.Child2;
                 }
             }
         }
