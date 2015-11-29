@@ -834,6 +834,38 @@ namespace FarseerPhysics.Dynamics
             }, ref input);
         }
 
+        public void MultiRayCast(MultiRayCastCallback callback, Vector2[] startPoints, Vector2[] endPoints)
+        {
+            Debug.Assert(startPoints.Length == endPoints.Length);
+
+            RayCastInput[] inputs = new RayCastInput[startPoints.Length];
+            for (int i = 0; i < startPoints.Length; i++)
+            {
+                inputs[i] = new RayCastInput();
+                inputs[i].MaxFraction = 1.0f;
+                inputs[i].Point1 = startPoints[i];
+                inputs[i].Point2 = endPoints[i];
+            }
+
+            ContactManager.BroadPhase.MultiRayCast(delegate(ref RayCastInput rayCastInput, int proxyId, int rayId)
+            {
+                FixtureProxy proxy = ContactManager.BroadPhase.GetProxy(proxyId);
+                Fixture fixture = proxy.Fixture;
+                int index = proxy.ChildIndex;
+                RayCastOutput output;
+                bool hit = fixture.RayCast(out output, ref rayCastInput, index);
+
+                if (hit)
+                {
+                    float fraction = output.Fraction;
+                    Vector2 point = (1.0f - fraction) * rayCastInput.Point1 + fraction * rayCastInput.Point2;
+                    return callback(fixture, point, output.Normal, fraction, rayId);
+                }
+
+                return rayCastInput.MaxFraction; //input.MaxFraction;
+            }, inputs);
+        }
+
         private void Solve(ref TimeStep step)
         {
             // Size the island for the worst case.

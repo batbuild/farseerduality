@@ -56,6 +56,8 @@ namespace FarseerPhysics.Collision
 
 	public delegate float RayCastCallbackInternal(ref RayCastInput input, int nodeId);
 
+	public delegate float MultiRayCastCallbackInternal(ref RayCastInput input, int nodeId, int rayId);
+
 	/// <summary>
 	/// A dynamic tree arranges data in a binary tree to accelerate
 	/// queries such as volume queries and ray casts. Leafs are proxies
@@ -406,6 +408,166 @@ namespace FarseerPhysics.Collision
                 }
             }
         }
+
+
+	    private struct SegmentAABB
+	    {
+	        public Vector2 P1;
+	        public Vector2 P2;
+	        public Vector2 R;
+	        public Vector2 AbsV;
+	        public AABB AABB;
+	        public float MaxFraction;
+	    }
+        /// <summary>
+        /// Ray-cast against the proxies in the tree. This relies on the callback
+        /// to perform a exact ray-cast in the case were the proxy contains a Shape.
+        /// The callback also performs the any collision filtering. This has performance
+        /// roughly equal to k * log(n), where k is the number of collisions and n is the
+        /// number of proxies in the tree.
+        /// </summary>
+        /// <param name="callback">A callback class that is called for each proxy that is hit by the ray.</param>
+        /// <param name="input">The ray-cast input data. The ray extends from p1 to p1 + maxFraction * (p2 - p1).</param>
+        public unsafe void MultiRayCast(MultiRayCastCallbackInternal callback, RayCastInput[] input)
+        {
+            SegmentAABB[] segmentAABBs = new SegmentAABB[input.Length];
+
+            for (int i = 0; i < input.Length; i++)
+            {
+                var s = new SegmentAABB();
+                s.P1 = input[i].Point1;
+                s.P2 = input[i].Point2;
+                s.R = s.P2 - s.P1;
+                s.R.Normalize();
+                s.AbsV = MathUtils.Abs(new Vector2(-s.R.Y, s.R.X));
+                s.MaxFraction = input[i].MaxFraction;
+                
+                s.AABB = new AABB();
+                Vector2 t = s.P1 + s.MaxFraction * (s.P2 - s.P1);
+                Vector2.Min(ref s.P1, ref t, out s.AABB.LowerBound);
+                Vector2.Max(ref s.P1, ref t, out s.AABB.UpperBound);
+
+                segmentAABBs[i] = s;
+            }
+
+            var rayIds = stackalloc int[input.Length];
+            for (int i = 0; i < input.Length; i++)
+            {
+                rayIds[i] = i;
+            }
+            
+            var stack = stackalloc int[32];
+            var numRaysStack = stackalloc int[32];
+            
+            var stackIndex = 0;
+			numRaysStack[stackIndex] = input.Length;
+			stack[stackIndex++] = _root;
+
+            while (stackIndex > 0)
+            {
+                int nodeId = stack[--stackIndex];
+                int last = numRaysStack[stackIndex];
+                int offset = 0;
+
+                if (nodeId == NullNode)
+                {
+                    continue;
+                }
+
+                DynamicTreeNode<T> node = _nodes[nodeId];
+
+                while(offset != last)
+                {
+                    var s = segmentAABBs[offset];
+                    if (RayAABBOverlap(ref node.AABB, ref s.AABB, s.R, s.P1, s.AbsV))
+                    {
+                        offset++;
+                    }
+                    else
+                    {
+                        last--;
+                        SegmentAABB temp = segmentAABBs[last];
+                        segmentAABBs[last] = segmentAABBs[offset];
+                        segmentAABBs[offset] = temp;
+
+                        var tempRayId = rayIds[last];
+                        rayIds[last] = rayIds[offset];
+                        rayIds[offset] = tempRayId;
+                    }
+                }
+
+                // if no rays intersected the node, continue
+                if (offset == 0)
+                    continue;
+
+                if (node.IsLeaf())
+                {
+                    for (var i = 0; i < offset; i++)
+                    {
+                        var s = segmentAABBs[i];
+
+                        RayCastInput subInput;
+                        subInput.Point1 = s.P1;
+                        subInput.Point2 = s.P2;
+                        subInput.MaxFraction = s.MaxFraction;
+
+                        float value = callback(ref subInput, nodeId, rayIds[i]);
+
+                        if (value == 0.0f)
+                        {
+                            // the client has terminated the raycast.
+                            return;
+                        }
+
+                        if (value > 0.0f)
+                        {
+                            // Update segment bounding box.
+                            s.MaxFraction = value;
+                            Vector2 t = s.P1 + s.MaxFraction * (s.P2 - s.P1);
+
+                            Vector2 min, max;
+                            Vector2.Min(ref s.P1, ref t, out min);
+                            Vector2.Max(ref s.P1, ref t, out max);
+                            s.AABB.LowerBound = min;
+                            s.AABB.UpperBound = max;
+                        }
+                    }
+                }
+                else
+                {
+					numRaysStack[stackIndex] = offset;
+                    stack[stackIndex++] = node.Child1;
+					numRaysStack[stackIndex] = offset;
+					stack[stackIndex++] = node.Child2;
+                }
+            }
+        }
+
+	    private bool RayAABBOverlap(ref AABB nodeAABB, ref AABB segmentAABB, Vector2 r, Vector2 p1, Vector2 absV)
+	    {
+	        if (AABB.TestOverlap(ref nodeAABB, ref segmentAABB) == false)
+	            return false;
+
+            // Separating axis for segment (Gino, p80).
+            // |dot(v, p1 - c)| > dot(|v|, h)
+            Vector2 c = nodeAABB.Center;
+            Vector2 h = nodeAABB.Extents;
+            var left = new Vector2(-r.Y, r.X);
+            var right = p1 - c;
+            float leftDot;
+            Vector2.Dot(ref left, ref right, out leftDot);
+
+            float rightDot;
+            Vector2.Dot(ref absV, ref h, out rightDot);
+
+            float separation = Math.Abs(leftDot) - rightDot;
+            if (separation > 0.0f)
+            {
+                return false;
+            }
+
+	        return true;
+	    }
 
         private int CountLeaves(int nodeId)
         {

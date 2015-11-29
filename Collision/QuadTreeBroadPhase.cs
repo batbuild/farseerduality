@@ -181,6 +181,11 @@ public class QuadTreeBroadPhase : IBroadPhase
         _quadTree.RayCast(TransformRayCallback(callback), ref input);
     }
 
+    public void MultiRayCast(MultiRayCastCallbackInternal callback, RayCastInput[] inputs)
+    {
+        throw new NotImplementedException();
+    }
+
     #endregion
 
     private AABB Fatten(ref AABB aabb)

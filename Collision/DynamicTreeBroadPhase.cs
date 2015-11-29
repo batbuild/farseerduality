@@ -255,6 +255,11 @@ namespace FarseerPhysics.Collision
             _tree.RayCast(callback, ref input);
         }
 
+        public void MultiRayCast(MultiRayCastCallbackInternal callback, RayCastInput[] inputs)
+        {
+            _tree.MultiRayCast(callback, inputs);
+        }
+
         public void TouchProxy(int proxyId)
         {
             BufferMove(proxyId);

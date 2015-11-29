@@ -26,5 +26,7 @@ namespace FarseerPhysics.Collision
         void Query(Func<int, bool> callback, ref AABB aabb);
 
         void RayCast(RayCastCallbackInternal callback, ref RayCastInput input);
+
+        void MultiRayCast(MultiRayCastCallbackInternal callback, RayCastInput[] inputs);
     }
 }
