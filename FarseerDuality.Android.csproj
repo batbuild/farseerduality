@@ -41,7 +41,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="OpenTK.Android, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>packages\OpenTK.Duality.Android.0.1.54\lib\MonoAndroid\OpenTK.Android.dll</HintPath>
+      <HintPath>packages\OpenTK.Duality.Android.0.1.55\lib\MonoAndroid\OpenTK.Android.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="System" />
